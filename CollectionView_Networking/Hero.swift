@@ -28,6 +28,7 @@ extension UIImageView {
             }
         }.resume()
     }
+    // If you get a string first convert it to URL
     func downloaded(from link: String, contentMode mode: ContentMode = .scaleAspectFit) {
         guard let url = URL(string: link) else { return }
         downloaded(from: url, contentMode: mode)
