@@ -31,10 +31,10 @@ class ViewController: UIViewController {
     // Give a completion handler to this, so when you are done with downloading the data we call that funciton
     func downloadJson(completed: @escaping () -> ()) {
         let url = URL(string: "https://api.opendota.com/api/heroStats")
-        URLSession.shared.dataTask(with: url!) { data, url, error in
+        URLSession.shared.dataTask(with: url!) { [weak self] data, url, error in
             if (error == nil) {
                 do {
-                    self.heroes = try JSONDecoder().decode([Hero].self, from: data!)
+                    self?.heroes = try JSONDecoder().decode([Hero].self, from: data!)
                     // Since we will relod the collection view here, we need to run it in the main thread, otherwise we will get an error of:
                     // UICollectionView.reloadData() must be used from main thread only
                     DispatchQueue.main.async {
