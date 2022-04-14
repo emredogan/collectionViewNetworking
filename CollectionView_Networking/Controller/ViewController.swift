@@ -10,8 +10,8 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var collectionView: UICollectionView!
+    let networkingClient: NetworkingClient = NetworkingClient()
     
-    var heroes = [Hero]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,44 +22,23 @@ class ViewController: UIViewController {
         
         collectionView.collectionViewLayout = UICollectionViewFlowLayout()
         
-        downloadJson {
-            print("SUCCESS", self.heroes)
+        networkingClient.downloadJson {
             self.collectionView.reloadData()
         }
         
     }
-    // Give a completion handler to this, so when you are done with downloading the data we call that funciton
-    func downloadJson(completed: @escaping () -> ()) {
-        let url = URL(string: "https://api.opendota.com/api/heroStats")
-        URLSession.shared.dataTask(with: url!) { [weak self] data, url, error in
-            if (error == nil) {
-                do {
-                    self?.heroes = try JSONDecoder().decode([Hero].self, from: data!)
-                    // Since we will relod the collection view here, we need to run it in the main thread, otherwise we will get an error of:
-                    // UICollectionView.reloadData() must be used from main thread only
-                    DispatchQueue.main.async {
-                        completed()
-                    }
-                    
-                } catch  {
-                    print("ERROR ", error)
-                }
-                
-            }
-        }.resume()
-        
-    }
+    
     
     
 }
 
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return heroes.count
+        return networkingClient.heroes.count
     }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "HeroCollectionViewCell", for: indexPath) as! HeroCollectionViewCell
-        cell.setup(with: heroes[indexPath.row])
+        cell.setup(with: networkingClient.heroes[indexPath.row])
         return cell
     }
     
